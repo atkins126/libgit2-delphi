@@ -6,33 +6,31 @@
 unit LibGit2;
 
 {$IFDEF FPC}
-{$mode objfpc}{$H+}
+{$MODE objfpc}{$H+}
 {$ENDIF}
+
+{$DEFINE GIT_DEPRECATE_HARD}
 
 interface
 
 uses
   SysUtils;
 
-{$IFDEF CPU32}
-{$ALIGN 4}
-{$ENDIF}
-
 const
   {$IFDEF MSWINDOWS}
-  libgit2_dll = 'git2.dll';
+  libgit2_dll                 = 'git2.dll';
   {$ELSE}
-  libgit2_dll = 'libgit2.so';
+  libgit2_dll                 = 'libgit2.so';
   {$ENDIF}
 
 type
   PPByte = ^PByte;
 
-{$I git2/stdint.inc}
-{$IFNDEF FPC}
+  {$I git2/stdint.inc}
+  {$IFNDEF FPC}
 type
   size_t = uintptr_t;
-{$ENDIF}
+  {$ENDIF}
 
 procedure InitLibgit2;
 procedure ShutdownLibgit2;
@@ -64,6 +62,7 @@ procedure ShutdownLibgit2;
 {$I git2/branch.inc}
 {$I git2/cert.inc}
 {$I git2/checkout.inc}
+{$I git2/email.inc}
 {$I git2/indexer.inc}
 {$I git2/index.inc}
 {$I git2/merge.inc}
@@ -186,8 +185,10 @@ end;
 
 function GIT_SUBMODULE_STATUS_IS_WD_DIRTY(S: Integer): Boolean;
 begin
-  Result := (S and (GIT_SUBMODULE_STATUS_WD_INDEX_MODIFIED or GIT_SUBMODULE_STATUS_WD_WD_MODIFIED or GIT_SUBMODULE_STATUS_WD_UNTRACKED)) = 0;
+  Result := (S and (GIT_SUBMODULE_STATUS_WD_INDEX_MODIFIED or GIT_SUBMODULE_STATUS_WD_WD_MODIFIED or
+    GIT_SUBMODULE_STATUS_WD_UNTRACKED)) = 0;
 end;
 
 end.
+
 

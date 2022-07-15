@@ -17,8 +17,8 @@
  * @return 0 on success or error code
   *)
 
-function git_annotated_commit_from_ref(out_: PPgit_annotated_commit;
-  repo: Pgit_repository; ref: Pgit_reference): Integer; cdecl; external libgit2_dll;
+function git_annotated_commit_from_ref(out_: PPgit_annotated_commit; repo: Pgit_repository;
+  ref: Pgit_reference): Integer; cdecl; external libgit2_dll;
 
 (**
  * Creates a `git_annotated_commit` from the given fetch head data.
@@ -33,9 +33,8 @@ function git_annotated_commit_from_ref(out_: PPgit_annotated_commit;
  * @return 0 on success or error code
   *)
 
-function git_annotated_commit_from_fetchhead(out_: PPgit_annotated_commit;
-  repo: Pgit_repository; branch_name, remote_url: PAnsiChar; id: Pgit_oid)
-  : Integer; cdecl; external libgit2_dll;
+function git_annotated_commit_from_fetchhead(out_: PPgit_annotated_commit; repo: Pgit_repository; branch_name, remote_url:
+  PAnsiChar; id: Pgit_oid): Integer; cdecl; external libgit2_dll;
 
 (**
  * Creates a `git_annotated_commit` from the given commit id.
@@ -56,11 +55,11 @@ function git_annotated_commit_from_fetchhead(out_: PPgit_annotated_commit;
  * @return 0 on success or error code
   *)
 
-function git_annotated_commit_lookup(out_: PPgit_annotated_commit;
-  repo: Pgit_repository; id: Pgit_oid): Integer; cdecl; external libgit2_dll;
+function git_annotated_commit_lookup(out_: PPgit_annotated_commit; repo: Pgit_repository;
+  id: Pgit_oid): Integer; cdecl; external libgit2_dll;
 
 (**
- * Creates a `git_annotated_comit` from a revision string.
+ * Creates a `git_annotated_commit` from a revision string.
  *
  * See `man gitrevisions`, or
  * http://git-scm.com/docs/git-rev-parse.html#_specifying_revisions for
@@ -72,8 +71,8 @@ function git_annotated_commit_lookup(out_: PPgit_annotated_commit;
  * @return 0 on success or error code
   *)
 
-function git_annotated_commit_from_revspec(out_: PPgit_annotated_commit;
-  repo: Pgit_repository; revspec: PAnsiChar): Integer; cdecl; external libgit2_dll;
+function git_annotated_commit_from_revspec(out_: PPgit_annotated_commit; repo: Pgit_repository;
+  revspec: PAnsiChar): Integer; cdecl; external libgit2_dll;
 
 (**
  * Gets the commit ID that the given `git_annotated_commit` refers to.
@@ -102,4 +101,6 @@ function git_annotated_commit_ref(commit: Pgit_annotated_commit): PAnsiChar; cde
 procedure git_annotated_commit_free(commit: Pgit_annotated_commit); cdecl; external libgit2_dll;
 
 (** @}  *)
+
+
 

@@ -1,4 +1,11 @@
 Windows Binaries
 ----------------
 
-[win32](https://onedrive.live.com/?authkey=%21ANlYcC%5Fpho2G15Y&id=88DA3AB8DE0BFAC7%21380&cid=88DA3AB8DE0BFAC7)
+Now included as part of the releases
+
+
+The oldest V1.0.1 can be accessed from below:
+
+[win32](https://1drv.ms/u/s!Asf6C964OtqIgn8mF6vy72j2pEbM?e=gSRuk5)
+
+[win64](https://1drv.ms/u/s!Asf6C964OtqIgwANFBhPCidIgB1S?e=6bvtOo)

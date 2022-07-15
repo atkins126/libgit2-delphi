@@ -39,8 +39,8 @@ function git_commit_lookup(commit: PPgit_commit; repo: Pgit_repository;
  * @return 0 or an error code
   *)
 
-function git_commit_lookup_prefix(commit: PPgit_commit; repo: Pgit_repository;
-  id: Pgit_oid; len: size_t): Integer; cdecl; external libgit2_dll;
+function git_commit_lookup_prefix(commit: PPgit_commit; repo: Pgit_repository; id: Pgit_oid;
+  len: size_t): Integer; cdecl; external libgit2_dll;
 
 (**
  * Close an open commit
@@ -182,8 +182,8 @@ function git_commit_author(commit: Pgit_commit): Pgit_signature; cdecl; external
  * @return 0 or an error code
   *)
 
-function git_commit_committer_with_mailmap(out_: PPgit_signature;
-  commit: Pgit_commit; mailmap: Pgit_mailmap): Integer; cdecl; external libgit2_dll;
+function git_commit_committer_with_mailmap(out_: PPgit_signature; commit: Pgit_commit;
+  mailmap: Pgit_mailmap): Integer; cdecl; external libgit2_dll;
 
 (**
  * Get the author of a commit, using the mailmap to map names and email
@@ -197,8 +197,8 @@ function git_commit_committer_with_mailmap(out_: PPgit_signature;
  * @return 0 or an error code
   *)
 
-function git_commit_author_with_mailmap(out_: PPgit_signature;
-  commit: Pgit_commit; mailmap: Pgit_mailmap): Integer; cdecl; external libgit2_dll;
+function git_commit_author_with_mailmap(out_: PPgit_signature; commit: Pgit_commit;
+  mailmap: Pgit_mailmap): Integer; cdecl; external libgit2_dll;
 
 (**
  * Get the full raw text of the commit header.
@@ -248,8 +248,7 @@ function git_commit_parentcount(commit: Pgit_commit): Cardinal; cdecl; external 
  * @return 0 or an error code
   *)
 
-function git_commit_parent(out_: PPgit_commit; commit: Pgit_commit; n: Cardinal)
-  : Integer; cdecl; external libgit2_dll;
+function git_commit_parent(out_: PPgit_commit; commit: Pgit_commit; n: Cardinal): Integer; cdecl; external libgit2_dll;
 
 (**
  * Get the oid of a specified parent for a commit. This is different from
@@ -278,8 +277,8 @@ function git_commit_parent_id(commit: Pgit_commit; n: Cardinal): Pgit_oid; cdecl
  * or an error code
   *)
 
-function git_commit_nth_gen_ancestor(ancestor: PPgit_commit;
-  commit: Pgit_commit; n: Cardinal): Integer; cdecl; external libgit2_dll;
+function git_commit_nth_gen_ancestor(ancestor: PPgit_commit; commit: Pgit_commit;
+  n: Cardinal): Integer; cdecl; external libgit2_dll;
 
 (**
  * Get an arbitrary header field
@@ -292,8 +291,7 @@ function git_commit_nth_gen_ancestor(ancestor: PPgit_commit;
  * or an error code
   *)
 
-function git_commit_header_field(out_: Pgit_buf; commit: Pgit_commit;
-  field: PAnsiChar): Integer; cdecl; external libgit2_dll;
+function git_commit_header_field(out_: Pgit_buf; commit: Pgit_commit; field: PAnsiChar): Integer; cdecl; external libgit2_dll;
 
 (**
  * Extract the signature from a commit
@@ -314,8 +312,8 @@ function git_commit_header_field(out_: Pgit_buf; commit: Pgit_commit;
  * or the commit does not have a signature.
   *)
 
-function git_commit_extract_signature(signature, signed_data: Pgit_buf;
-  repo: Pgit_repository; commit_id: Pgit_oid; field: PAnsiChar): Integer; cdecl; external libgit2_dll;
+function git_commit_extract_signature(signature, signed_data: Pgit_buf; repo: Pgit_repository;
+  commit_id: Pgit_oid; field: PAnsiChar): Integer; cdecl; external libgit2_dll;
 
 (**
  * Create new commit in the repository from a list of `git_object` pointers
@@ -362,10 +360,9 @@ function git_commit_extract_signature(signature, signed_data: Pgit_buf;
  *	the given reference will be updated to point to it
   *)
 
-function git_commit_create(id: Pgit_oid; repo: Pgit_repository;
-  update_ref: PAnsiChar; author, committer: Pgit_signature;
-  message_encoding, message: PAnsiChar; tree: Pgit_tree; parent_count: size_t;
-  parents: PPgit_commit): Integer; cdecl; external libgit2_dll;
+function git_commit_create(id: Pgit_oid; repo: Pgit_repository; update_ref: PAnsiChar;
+  author, committer: Pgit_signature; message_encoding, message: PAnsiChar; tree: Pgit_tree;
+  parent_count: size_t; parents: PPgit_commit): Integer; cdecl; external libgit2_dll;
 
 (**
  * Create new commit in the repository using a variable argument list.
@@ -382,10 +379,9 @@ function git_commit_create(id: Pgit_oid; repo: Pgit_repository;
  * @see git_commit_create
   *)
 
-function git_commit_create_v(id: Pgit_oid; repo: Pgit_repository;
-  update_ref: PAnsiChar; author, committer: Pgit_signature;
-  message_encoding, message: PAnsiChar; tree: Pgit_tree; parent_count: size_t)
-  : Integer; cdecl varargs; external libgit2_dll;
+function git_commit_create_v(id: Pgit_oid; repo: Pgit_repository; update_ref: PAnsiChar;
+  author, committer: Pgit_signature; message_encoding, message: PAnsiChar; tree:
+  Pgit_tree; parent_count: size_t): Integer; cdecl varargs; external libgit2_dll;
 
 (**
  * Amend an existing commit by replacing only non-NULL values.
@@ -409,9 +405,9 @@ function git_commit_create_v(id: Pgit_oid; repo: Pgit_repository;
  * @see git_commit_create
   *)
 
-function git_commit_amend(id: Pgit_oid; commit_to_amend: Pgit_commit;
-  update_ref: PAnsiChar; author, committer: Pgit_signature;
-  message_encoding, message: PAnsiChar; tree: Pgit_tree): Integer; cdecl; external libgit2_dll;
+function git_commit_amend(id: Pgit_oid; commit_to_amend: Pgit_commit; update_ref: PAnsiChar;
+  author, committer: Pgit_signature; message_encoding, message: PAnsiChar;
+  tree: Pgit_tree): Integer; cdecl; external libgit2_dll;
 
 (**
  * Create a commit and write it into a buffer
@@ -450,8 +446,8 @@ function git_commit_amend(id: Pgit_oid; commit_to_amend: Pgit_commit;
   *)
 
 function git_commit_create_buffer(out_: Pgit_buf; repo: Pgit_repository;
-  author, committer: Pgit_signature; message_encoding, message: PAnsiChar;
-  tree: Pgit_tree; parent_count: size_t; parents: PPgit_commit): Integer; cdecl; external libgit2_dll;
+  author, committer: Pgit_signature; message_encoding, message: PAnsiChar; tree: Pgit_tree;
+  parent_count: size_t; parents: PPgit_commit): Integer; cdecl; external libgit2_dll;
 
 (**
  * Create a commit object from the given buffer and signature
@@ -469,9 +465,8 @@ function git_commit_create_buffer(out_: Pgit_buf; repo: Pgit_repository;
  * @return 0 or an error code
   *)
 
-function git_commit_create_with_signature(out_: Pgit_oid;
-  repo: Pgit_repository; commit_content, signature, signature_field: PAnsiChar)
-  : Integer; cdecl; external libgit2_dll;
+function git_commit_create_with_signature(out_: Pgit_oid; repo: Pgit_repository;
+  commit_content, signature, signature_field: PAnsiChar): Integer; cdecl; external libgit2_dll;
 
 (**
  * Create an in-memory copy of a commit. The copy must be explicitly
@@ -484,27 +479,37 @@ function git_commit_create_with_signature(out_: Pgit_oid;
 function git_commit_dup(out_: PPgit_commit; source: Pgit_commit): Integer; cdecl; external libgit2_dll;
 
 (**
- * Commit signing callback.
+ * Commit creation callback: used when a function is going to create
+ * commits (for example, in `git_rebase_commit`) to allow callers to
+ * override the commit creation behavior.  For example, users may
+ * wish to sign commits by providing this information to
+ * `git_commit_create_buffer`, signing that buffer, then calling
+ * `git_commit_create_with_signature`.  The resultant commit id
+ * should be set in the `out` object id parameter.
  *
- * The callback will be called with the commit content, giving a user an
- * opportunity to sign the commit content. The signature_field
- * buf may be left empty to specify the default field "gpgsig".
- *
- * Signatures can take the form of any string, and can be created on an arbitrary
- * header field. Signatures are most commonly used for verifying authorship of a
- * commit using GPG or a similar cryptographically secure signing algorithm.
- * See https://git-scm.com/book/en/v2/Git-Tools-Signing-Your-Work for more
- * details.
- *
- * When the callback:
- * - returns GIT_PASSTHROUGH, no signature will be added to the commit.
- * - returns < 0, commit creation will be aborted.
- * - returns GIT_OK, the signature parameter is expected to be filled.
-  *)
-
+ * @param out pointer that this callback will populate with the object
+ *            id of the commit that is created
+ * @param author the author name and time of the commit
+ * @param committer the committer name and time of the commit
+ * @param message_encoding the encoding of the given message, or NULL
+ *                         to assume UTF8
+ * @param message the commit message
+ * @param tree the tree to be committed
+ * @param parent_count the number of parents for this commit
+ * @param parents the commit parents
+ * @param payload the payload pointer in the rebase options
+ * @return 0 if this callback has created the commit and populated the out
+ *         parameter, GIT_PASSTHROUGH if the callback has not created a
+ *         commit and wants the calling function to create the commit as
+ *         if no callback had been specified, any other value to stop
+ *         and return a failure
+ *)
 type
-  git_commit_signing_cb = function(signature, signature_field: Pgit_buf;
-    commit_content: PAnsiChar; payload: Pointer): Integer; cdecl;
+  git_commit_create_cb = function(out_: Pgit_oid; author: Pgit_signature; committer: Pgit_signature;
+    message_encoding: PAnsiChar; message: PAnsiChar; tree: Pgit_tree; parent_count: size_t; parents: PPgit_commit;
+    payload: Pointer): Integer; cdecl;
 
   (** @}  *)
+
+
 
