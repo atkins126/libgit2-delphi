@@ -1,24 +1,35 @@
 (*
- * Copyright (C) 2021 Today Software
+ * Copyright (C) 2021-2023 Today Software
  * Distributed under the MIT licence see LICENCE file for more details
  * https://opensource.org/licenses/MIT
  *)
 unit LibGit2;
 
 {$IFDEF FPC}
-{$MODE objfpc}{$H+}
+  {$MODE objfpc}{$H+}
+{$ELSE}
+  {$IF RTLVersion >= 23}
+    {$DEFINE DOTTEDUNITS}
+  {$IFEND}
 {$ENDIF}
 
 {$DEFINE GIT_DEPRECATE_HARD}
+{*$DEFINE GIT_EXPERIMENTAL_SHA256}
 
 interface
 
 uses
+  {$IF DEFINED(DOTTEDUNITS) OR DEFINED(FPC_DOTTEDUNITS)}
+  System.SysUtils;
+  {$ELSE}
   SysUtils;
+  {$IFEND}
 
 const
-  {$IFDEF MSWINDOWS}
+  {$IF DEFINED(MSWINDOWS)}
   libgit2_dll                 = 'git2.dll';
+  {$ELSEIF DEFINED(MACOS)}
+  libgit2_dll                 = 'libgit2.dylib';
   {$ELSE}
   libgit2_dll                 = 'libgit2.so';
   {$ENDIF}
@@ -26,11 +37,11 @@ const
 type
   PPByte = ^PByte;
 
-  {$I git2/stdint.inc}
-  {$IFNDEF FPC}
+{$I git2/stdint.inc}
+{$IF NOT DECLARED(size_t)}
 type
   size_t = uintptr_t;
-  {$ENDIF}
+{$IFEND}
 
 procedure InitLibgit2;
 procedure ShutdownLibgit2;
@@ -51,6 +62,7 @@ procedure ShutdownLibgit2;
 {$I git2/oid.inc}
 {$I git2/oidarray.inc}
 {$I git2/strarray.inc}
+{$I git2/commit.inc}
 {$I git2/repository.inc}
 {$I git2/diff.inc}
 {$I git2/object.inc}
@@ -76,7 +88,6 @@ procedure ShutdownLibgit2;
 {$I git2/transport.inc}
 {$I git2/remote.inc}
 {$I git2/clone.inc}
-{$I git2/commit.inc}
 {$I git2/config.inc}
 {$I git2/describe.inc}
 {$I git2/errors.inc}
@@ -190,5 +201,3 @@ begin
 end;
 
 end.
-
-

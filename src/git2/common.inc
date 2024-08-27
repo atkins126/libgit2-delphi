@@ -18,11 +18,7 @@ const
    *)
 
   GIT_PATH_MAX                = 4096;
-  (**
-   * The string representation of the null object ID.
-   *)
 
-  GIT_OID_HEX_ZERO            = '0000000000000000000000000000000000000000';
   (**
    * Return the version of the libgit2 library
    * being currently used.
@@ -34,6 +30,18 @@ const
    *)
 
 function git_libgit2_version(major, minor, rev: PInteger): Integer; cdecl; external libgit2_dll;
+
+(**
+ * Return the prerelease state of the libgit2 library currently being
+ * used.  For nightly builds during active development, this will be
+ * "alpha".  Releases may have a "beta" or release candidate ("rc1",
+ * "rc2", etc) prerelease.  For a final release, this function returns
+ * NULL.
+ *
+ * @return the name of the prerelease state or NULL
+ *)
+
+function git_libgit2_prerelease: PAnsiChar; cdecl; external libgit2_dll;
 
 (**
  * Combinations of these values describe the features with which libgit2
@@ -135,6 +143,12 @@ const
   GIT_OPT_SET_EXTENSIONS      = 34;
   GIT_OPT_GET_OWNER_VALIDATION = 35;
   GIT_OPT_SET_OWNER_VALIDATION = 36;
+  GIT_OPT_GET_HOMEDIR         = 37;
+  GIT_OPT_SET_HOMEDIR         = 38;
+  GIT_OPT_SET_SERVER_CONNECT_TIMEOUT = 39;
+  GIT_OPT_GET_SERVER_CONNECT_TIMEOUT = 40;
+  GIT_OPT_SET_SERVER_TIMEOUT  = 41;
+  GIT_OPT_GET_SERVER_TIMEOUT  = 42;
 type
   git_libgit2_opt_t = Integer;
 
@@ -382,12 +396,37 @@ type
    *      > Set that repository directories should be owned by the current
    *      > user. The default is to validate ownership.
    *
+   *   opts(GIT_OPT_GET_HOMEDIR, git_buf *out)
+   *      > Gets the current user's home directory, as it will be used
+   *      > for file lookups. The path is written to the `out` buffer.
+   *
+   *   opts(GIT_OPT_SET_HOMEDIR, const char *path)
+   *      > Sets the directory used as the current user's home directory,
+   *      > for file lookups.
+   *      >
+   *      > - `path` directory of home directory.
+   *
+   *   opts(GIT_OPT_GET_SERVER_CONNECT_TIMEOUT, int *timeout)
+   *      > Gets the timeout (in milliseconds) to attempt connections to
+   *      > a remote server.
+   *
+   *   opts(GIT_OPT_SET_SERVER_CONNECT_TIMEOUT, int timeout)
+   *      > Sets the timeout (in milliseconds) to attempt connections to
+   *      > a remote server. Set to 0 to use the system default. Note that
+   *      > this may not be able to be configured longer than the system
+   *      > default, typically 75 seconds.
+   *
+   *   opts(GIT_OPT_GET_SERVER_TIMEOUT, int *timeout)
+   *      > Gets the timeout (in milliseconds) for reading from and writing
+   *      > to a remote server.
+   *
+   *   opts(GIT_OPT_SET_SERVER_TIMEOUT, int timeout)
+   *      > Sets the timeout (in milliseconds) for reading from and writing
+   *      > to a remote server. Set to 0 to use the system default.
+   *
    * @param option Option key
    * @param ... value to set the option
    * @return 0 on success, <0 on failure
    *)
 
-function git_libgit2_opts(option: Integer): Integer; cdecl varargs; external libgit2_dll;
-
-
-
+function git_libgit2_opts(option: Integer): Integer; cdecl; varargs; external libgit2_dll;

@@ -289,6 +289,14 @@ const
 type
   git_remote_redirect_t = Integer;
 
+const
+  (** Constants for fetch depth (shallowness of fetch). *)
+  (** The fetch is "full" (not shallow). This is the default. *)
+  GIT_FETCH_DEPTH_FULL        = 0;
+
+  (** The fetch should "unshallow" and fetch missing data. *)
+  GIT_FETCH_DEPTH_UNSHALLOW   = 2147483647;
+
   (**
    * Fetch options structure.
    *
@@ -297,7 +305,7 @@ type
    *
    *		git_fetch_options opts = GIT_FETCH_OPTIONS_INIT;
    *)
-
+type
   git_fetch_options = record
     version: Cardinal;
     (**
@@ -309,8 +317,7 @@ type
      *)
     prune: git_fetch_prune_t;
     (**
-     * Whether to write the results to FETCH_HEAD. Defaults to
-     * on. Leave this default in order to behave like git.
+     * How to handle reference updates; see `git_remote_update_flags`.
      *)
     update_fetchhead: Integer;
     (**
@@ -325,6 +332,14 @@ type
      * Proxy options to use, by default no proxy is used.
      *)
     proxy_opts: git_proxy_options;
+    (**
+     * Depth of the fetch to perform, or `GIT_FETCH_DEPTH_FULL`
+     * (or `0`) for full history, or `GIT_FETCH_DEPTH_UNSHALLOW`
+     * to "unshallow" a shallow repository.
+     *
+     * The default is full (`GIT_FETCH_DEPTH_FULL` or `0`).
+     *)
+    depth: Integer;
     (**
      * Whether to allow off-site redirects.  If this is not
      * specified, the `http.followRedirects` configuration setting
@@ -388,6 +403,10 @@ type
      * Extra headers for this push operation
      *)
     custom_headers: git_strarray;
+    (**
+     * "Push options" to deliver to the remote.
+     *)
+    remote_push_options: git_strarray;
   end;
   Pgit_push_options = ^git_push_options;
 
@@ -430,7 +449,19 @@ const
   GIT_REMOTE_CREATE_SKIP_DEFAULT_FETCHSPEC = (1 shl 1);
 
 type
-  git_remote_create_flags = Integer;
+  git_remote_create_flags = Cardinal;
+
+  (**
+   * How to handle reference updates.
+   *)
+const
+  (* Write the fetch results to FETCH_HEAD. *)
+  GIT_REMOTE_UPDATE_FETCHHEAD = (1 shl 0);
+  (* Report unchanged tips in the update_tips callback. *)
+  GIT_REMOTE_UPDATE_REPORT_UNCHANGED = (1 shl 1);
+
+type
+  git_remote_update_flags = Cardinal;
 
   (**
    * Remote creation options structure
@@ -961,14 +992,14 @@ function git_remote_upload(remote: Pgit_remote; refspecs: Pgit_strarray;
  * the name of the remote (or its url, for in-memory remotes). This
  * parameter is ignored when pushing.
  * @param callbacks  pointer to the callback structure to use or NULL
- * @param update_fetchhead whether to write to FETCH_HEAD. Pass 1 to behave like git.
+ * @param update_flags the git_remote_update_flags for these tips.
  * @param download_tags what the behaviour for downloading tags is for this fetch. This is
  * ignored for push. This must be the same value passed to `git_remote_download()`.
  * @return 0 or an error code
  *)
 
 function git_remote_update_tips(remote: Pgit_remote; callbacks: Pgit_remote_callbacks;
-  update_fetchhead: Integer; download_tags: git_remote_autotag_option_t;
+  update_flags: Cardinal; download_tags: git_remote_autotag_option_t;
   reflog_message: PAnsiChar): Integer; cdecl; external libgit2_dll;
 
 (**
@@ -1128,6 +1159,4 @@ function git_remote_delete(repo: Pgit_repository; name_: PAnsiChar): Integer; cd
 function git_remote_default_branch(out_: Pgit_buf; remote: Pgit_remote): Integer; cdecl; external libgit2_dll;
 
 (** @}  *)
-
-
 

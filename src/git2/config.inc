@@ -8,8 +8,19 @@
 
 (**
  * Priority level of a config file.
+ *
  * These priority levels correspond to the natural escalation logic
- * (from higher to lower) when searching for config entries in git.git.
+ * (from higher to lower) when reading or searching for config entries
+ * in git.git. Meaning that for the same key, the configuration in
+ * the local configuration is preferred over the configuration in
+ * the system configuration file.
+ *
+ * Callers can add their own custom configuration, beginning at the
+ * `GIT_CONFIG_LEVEL_APP` level.
+ *
+ * Writes, by default, occur in the highest priority level backend
+ * that is writable. This ordering can be overridden with
+ * `git_config_set_writeorder`.
  *
  * git_config_open_default() and git_repository_config() honor those
  * priority levels as well.
@@ -30,15 +41,19 @@ const
   * non-bare repos
    *)
   GIT_CONFIG_LEVEL_LOCAL      = 5;
+  (** Worktree specific configuration file; $GIT_DIR/config.worktree
+  *)
+  GIT_CONFIG_LEVEL_WORKTREE   = 6;
   (** Application specific configuration file; freely defined by applications
    *)
-  GIT_CONFIG_LEVEL_APP        = 6;
+  GIT_CONFIG_LEVEL_APP        = 7;
   (** Represents the highest level available config file (i.e. the most
    * specific config file available that actually is loaded)
    *)
   GIT_CONFIG_HIGHEST_LEVEL    = -1;
 type
   git_config_level_t = Integer;
+  Pgit_config_level_t = ^git_config_level_t;
 
   (**
    * An entry in a configuration file
@@ -47,12 +62,26 @@ type
 type
   Pgit_config_entry = ^git_config_entry;
   git_config_entry = record
-    name_: PAnsiChar; (**< Name of the entry (normalised)  *)
-    Value: PAnsiChar; (**< String value of the entry  *)
-    include_depth: Cardinal; (**< Depth of includes where this variable was found  *)
-    level: git_config_level_t; (**< Which config file this was found in  *)
+    (** Name of the configuration entry (normalized) *)
+    name_: PAnsiChar;
+    (** Literal (string) value of the entry *)
+    Value: PAnsiChar;
+    (** The type of backend that this entry exists in (eg, "file") *)
+    backend_type: PAnsiChar;
+    (**
+     * The path to the origin of this entry. For config files, this is
+     * the path to the file.
+     *)
+    origin_path: PAnsiChar;
+    (** Depth of includes where this variable was found *)
+    include_depth: Cardinal;
+    (** Configuration level for the file this was found in *)
+    level: git_config_level_t;
+    (**
+     * Free function for this entry; for internal purposes. Callers
+     * should call `git_config_entry_free` to free data.
+     *)
     Free: procedure(entry: Pgit_config_entry); cdecl; (**< Free function for this entry  *)
-    payload: Pointer; (**< Opaque value for the free function. Do not read or write  *)
   end;
 
   (**
@@ -116,7 +145,7 @@ type
    * global configuration file.
    *
    * This method will not guess the path to the xdg compatible
-   * config file (.config/git/config).
+   * config file ( .config/git/config ).
    *
    * @param out Pointer to a user-allocated git_buf in which to store the path
    * @return 0 if a global configuration file has been found. Its path will be stored in `out`.
@@ -145,8 +174,8 @@ function git_config_find_xdg(out_: Pgit_buf): Integer; cdecl; external libgit2_d
 (**
  * Locate the path to the system configuration file
  *
- * If /etc/gitconfig doesn't exist, it will look for
- * %PROGRAMFILES%\Git\etc\gitconfig.
+ * If `/etc/gitconfig` doesn't exist, it will look for
+ * `%PROGRAMFILES%\Git\etc\gitconfig`.
  *
  * @param out Pointer to a user-allocated git_buf in which to store the path
  * @return 0 if a system configuration file has been
@@ -158,7 +187,7 @@ function git_config_find_system(out_: Pgit_buf): Integer; cdecl; external libgit
 (**
  * Locate the path to the configuration file in ProgramData
  *
- * Look for the file in %PROGRAMDATA%\Git\config used by portable git.
+ * Look for the file in `%PROGRAMDATA%\Git\config` used by portable git.
  *
  * @param out Pointer to a user-allocated git_buf in which to store the path
  * @return 0 if a ProgramData configuration file has been
@@ -273,6 +302,9 @@ function git_config_open_level(out_: PPgit_config; parent: Pgit_config;
  *)
 
 function git_config_open_global(out_: PPgit_config; config: Pgit_config): Integer; cdecl; external libgit2_dll;
+
+function git_config_set_writeorder(config: Pgit_config; levels: Pgit_config_level_t;
+  len: size_t): Integer; cdecl; external libgit2_dll;
 
 (**
  * Create a snapshot of the configuration
@@ -471,8 +503,8 @@ function git_config_multivar_iterator_new(out_: PPgit_config_iterator; cfg: Pgit
 (**
  * Return the current entry and advance the iterator
  *
- * The pointers returned by this function are valid until the iterator
- * is freed.
+ * The pointers returned by this function are valid until the next call
+ * to `git_config_next` or until the iterator is freed.
  *
  * @param entry pointer to store the entry
  * @param iter the iterator
@@ -808,6 +840,4 @@ function git_config_backend_foreach_match(backend: Pgit_config_backend; regexp: 
 function git_config_lock(tx: PPgit_transaction; cfg: Pgit_config): Integer; cdecl; external libgit2_dll;
 
 (** @}  *)
-
-
 

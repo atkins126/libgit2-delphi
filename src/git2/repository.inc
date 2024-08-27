@@ -45,9 +45,14 @@ function git_repository_open_from_worktree(out_: PPgit_repository; wt: Pgit_work
  * @param out pointer to the repo
  * @param odb the object database to wrap
  * @return 0 or an error code
+ * @param oid_type the oid type of the object database
  *)
 
-function git_repository_wrap_odb(out_: PPgit_repository; odb: Pgit_odb): Integer; cdecl; external libgit2_dll;
+function git_repository_wrap_odb(out_: PPgit_repository; odb: Pgit_odb
+  {$IFDEF GIT_EXPERIMENTAL_SHA256}
+  ; oid_type: git_oid_t
+  {$ENDIF}
+  ): Integer; cdecl; external libgit2_dll;
 
 (**
  * Look for a git repository and copy its path in the given buffer.
@@ -325,6 +330,14 @@ type
      * pointing to this URL.
      *)
     origin_url: PAnsiChar;
+    {$IFDEF GIT_EXPERIMENTAL_SHA256}
+    (**
+     *
+     * Type of object IDs to use for this repository, or 0 for
+     * default (currently SHA1).
+     *)
+    oid_type: git_oid_t;
+    {$ENDIF}
   end;
   Pgit_repository_init_options = ^git_repository_init_options;
 
@@ -434,7 +447,9 @@ function git_repository_head_unborn(repo: Pgit_repository): Integer; cdecl; exte
  * Check if a repository is empty
  *
  * An empty repository has just been initialized and contains no references
- * apart from HEAD, which must be pointing to the unborn master branch.
+ * apart from HEAD, which must be pointing to the unborn master branch,
+ * or the branch specified for the repository in the `init.defaultBranch`
+ * configuration variable.
  *
  * @param repo Repo to test
  * @return 1 if the repository is empty, 0 if it isn't, error code
@@ -462,7 +477,8 @@ const
   GIT_REPOSITORY_ITEM_LOGS    = 11;
   GIT_REPOSITORY_ITEM_MODULES = 12;
   GIT_REPOSITORY_ITEM_WORKTREES = 13;
-  GIT_REPOSITORY_ITEM__LAST   = 14;
+  GIT_REPOSITORY_ITEM_WORKTREE_CONFIG = 14;
+  GIT_REPOSITORY_ITEM__LAST   = 15;
 type
   git_repository_item_t = Integer;
 
@@ -946,7 +962,25 @@ function git_repository_ident(name_, email: PPAnsiChar; repo: Pgit_repository): 
 
 function git_repository_set_ident(repo: Pgit_repository; name_, email: PAnsiChar): Integer; cdecl; external libgit2_dll;
 
+(**
+ * Gets the object type used by this repository.
+ *
+ * @param repo the repository
+ * @return the object id type
+ *)
+function git_repository_oid_type(repo: Pgit_repository): git_oid_t; cdecl; external libgit2_dll;
+
+(**
+ * Gets the parents of the next commit, given the current repository state.
+ * Generally, this is the HEAD commit, except when performing a merge, in
+ * which case it is two or more commits.
+ *
+ * @param commits a `git_commitarray` that will contain the commit parents
+ * @param repo the repository
+ * @return 0 or an error code
+ *)
+function git_repository_commit_parents(commits: Pgit_commitarray; repo: Pgit_repository): Integer;
+  cdecl; external libgit2_dll;
+
 (** @}  *)
-
-
 
